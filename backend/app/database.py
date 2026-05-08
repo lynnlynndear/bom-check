@@ -1,3 +1,4 @@
+import traceback
 from collections.abc import Generator
 from os import getenv
 
@@ -6,10 +7,18 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
 DATABASE_URL = getenv("DATABASE_URL", "sqlite:///./bom_v3.db")
+print(f"[DB] DATABASE_URL={DATABASE_URL}")
 
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-engine = create_engine(DATABASE_URL, connect_args=connect_args, future=True)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+try:
+    connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+    engine = create_engine(DATABASE_URL, connect_args=connect_args, future=True)
+    SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+except Exception as exc:
+    print("=" * 60)
+    print("DATABASE ERROR:")
+    print(traceback.format_exc())
+    print("=" * 60)
+    raise
 
 
 if DATABASE_URL.startswith("sqlite"):

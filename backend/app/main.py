@@ -1,3 +1,4 @@
+import traceback
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -5,12 +6,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api_v3 import router as api_v3_router
-from .database import init_db
-
-
 APP_ROOT = Path(__file__).resolve().parents[2]
 FRONTEND_DIR = APP_ROOT / "frontend"
+
+try:
+    from .api_v3 import router as api_v3_router
+    from .database import init_db
+except Exception as exc:
+    print("=" * 60)
+    print("IMPORT ERROR:")
+    print(traceback.format_exc())
+    print("=" * 60)
+    raise
 
 
 def create_app() -> FastAPI:
